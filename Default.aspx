@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Home Page" Language="vb" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.vb" Inherits="TodoList._Default" %>
+<%@ Page Title="Home Page" Language="vb" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.vb" Inherits="TodoList._Default" %>
 
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
 
@@ -64,6 +64,10 @@
             color: red;
         }
 
+        .riscado {
+            text-decoration: line-through;
+        }
+
     </style>
     <form runat="server">
         <div class="container">   
@@ -76,15 +80,14 @@
             <!-- Tabela para exibir as tarefas existentes -->
             <div class="table-responsive">
                 <br />
-                <asp:GridView ID="gridTarefas" runat="server" AutoGenerateColumns="False" CssClass="table table-striped" OnRowCommand="gridTarefas_RowCommand" DataKeyNames="ID">
+                <asp:GridView ID="gridTarefas" runat="server" OnRowDataBound="gridTarefas_RowDataBound" AutoGenerateColumns="False" CssClass="table table-striped" OnRowCommand="gridTarefas_RowCommand" DataKeyNames="ID">
                     <Columns>
                         <asp:BoundField DataField="ID" HeaderText="ID" Visible="false" />
                         <asp:BoundField DataField="TITULO" HeaderText="Tarefa" HeaderStyle-CssClass="text-center" ItemStyle-CssClass="text-center" />
                         <asp:BoundField DataField="DESCRICAO" HeaderText="Descrição" HeaderStyle-CssClass="text-center" ItemStyle-CssClass="text-center" />                        
                         <asp:TemplateField HeaderText="Concluído" HeaderStyle-CssClass="text-center" ItemStyle-CssClass="text-center" ItemStyle-Width="100px">
                             <ItemTemplate>
-                                <input type="checkbox" id="chkConcluido" class="chkConcluido" <%# If(Convert.ToBoolean(Eval("CONCLUIDO")), "checked", "") %> onclick="checkBoxClicked(this)" />
-                                <span class="tarefa-id" style="display: none;"><%# Eval("ID") %></span>
+                                <asp:CheckBox ID="chkConcluido" runat="server" CssClass="chkConcluido" Checked='<%# Convert.ToBoolean(Eval("CONCLUIDO")) %>' OnCheckedChanged="chkConcluido_CheckedChanged" AutoPostBack="true" />
                             </ItemTemplate>
                         </asp:TemplateField>
                         <asp:TemplateField HeaderStyle-CssClass="text-center" ItemStyle-CssClass="text-center" ItemStyle-Width="150px">
@@ -166,26 +169,32 @@
         </div>
     </form>
 
-    <script>
-        function checkBoxClicked(checkbox) {
-            var tarefaId = $(checkbox).closest('tr').find('.tarefa-id').text();
-            var concluido = checkbox.checked;
-
-            var requestData = {
-                id: tarefaId,
-                concluido: concluido
-            };
-
-            $.ajax({
-                type: 'POST',
-                url: 'AtualizarConcluido.aspx',
-                data: JSON.stringify(requestData),
-                contentType: 'application/json'
-            });
-
-            return false;
-        };
+    <script type="text/javascript">
+        function updateTaskTitleStyle(checkbox) {
+            var tarefaCell = $(checkbox).closest('tr').find('td:nth-child(2)');
+            tarefaCell.toggleClass('riscado', checkbox.checked);
+        }
     </script>
 
+
+    <%--<script>
+        function checkBoxClicked(checkbox) {
+            console.log('checkBoxClicked function called');
+            var tarefaCell = $(checkbox).closest('tr').find('td:nth-child(1)');
+            var descricaoCell = $(checkbox).closest('tr').find('td:nth-child(2)');
+
+            if (checkbox.checked) {
+                tarefaCell.addClass('riscado');
+                descricaoCell.addClass('riscado');
+            } else {
+                tarefaCell.removeClass('riscado');
+                descricaoCell.removeClass('riscado');
+            }
+
+            return true;
+        };
+
+
+    </script>--%>
 
 </asp:Content>
