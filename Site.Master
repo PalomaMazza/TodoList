@@ -1,0 +1,45 @@
+﻿<%@ Master Language="VB" AutoEventWireup="true" CodeBehind="Site.master.VB" Inherits="TodoList.SiteMaster" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <%--<title>Todo List</title>--%>
+    <link href="Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="Content/Site.css" rel="stylesheet" />
+    <script src="Scripts/jquery-3.4.1.min.js"></script>
+    <script src="Scripts/bootstrap.min.js"></script>
+</head>
+<body>
+    <div id="header" class="jumbotron text-center">
+        <img src="img/logo.png" alt="logo" class="img-fluid mx-auto d-block mt-0" style="max-width: 125px;" />
+        <h5 class="my-0">Lista de Tarefas</h5>
+        <p class="lead">Gerenciador de tarefas pessoal</p>
+    </div>
+
+<%--    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link custom-margin" href="Default.aspx">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link custom-margin" href="About.aspx">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link custom-margin" href="Contact.aspx">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>--%>
+    
+    <!-- Área de conteúdo das páginas de conteúdo -->
+    <asp:ContentPlaceHolder ID="MainContent" runat="server">
+    </asp:ContentPlaceHolder>
+    
+    <div id="footer">
+        <!-- Defina o rodapé aqui -->
+    </div>
+</body>
+</html>
