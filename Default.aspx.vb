@@ -1,4 +1,4 @@
-﻿Imports MySql.Data.MySqlClient
+Imports MySql.Data.MySqlClient
 Imports System
 Imports System.Data
 Imports System.Data.SqlClient
@@ -37,7 +37,6 @@ Public Class _Default
             End Using
         End Using
     End Sub
-
     Protected Sub gridTarefas_RowCommand(ByVal sender As Object, ByVal e As GridViewCommandEventArgs) Handles gridTarefas.RowCommand
         If e.CommandName = "Excluir" Then
             Dim tarefaId As Integer = Convert.ToInt32(e.CommandArgument)
@@ -53,6 +52,23 @@ Public Class _Default
             ScriptManager.RegisterStartupScript(Me, Me.GetType(), "AbrirModalEdicao", "$('#editarTarefaModal').modal('show');", True)
         End If
     End Sub
+
+    Protected Sub gridTarefas_RowDataBound(ByVal sender As Object, ByVal e As GridViewRowEventArgs) Handles gridTarefas.RowDataBound
+        If e.Row.RowType = DataControlRowType.DataRow Then
+            Dim concluido As Boolean = Convert.ToBoolean(DataBinder.Eval(e.Row.DataItem, "CONCLUIDO"))
+            Dim tarefaCell As TableCell = e.Row.Cells(1)
+            Dim descricaocell As TableCell = e.Row.Cells(2)
+
+            If concluido Then
+                tarefaCell.CssClass = "text-center riscado"
+                descricaocell.CssClass = "text-center riscado"
+            Else
+                tarefaCell.CssClass = "text-center"
+                descricaocell.CssClass = "text-center"
+            End If
+        End If
+    End Sub
+
     Protected Sub ExcluirTarefa(ByVal tarefaId As Integer)
         Dim connectionString As String = ConfigurationManager.ConnectionStrings("ConnectionStringTodoList").ConnectionString
 
@@ -122,13 +138,12 @@ Public Class _Default
         Dim button As Button = DirectCast(sender, Button)
         Dim tarefaId As Integer = Convert.ToInt32(button.CommandArgument)
 
-        ' Conexão com o banco de dados
         Dim connectionString As String = ConfigurationManager.ConnectionStrings("ConnectionStringTodoList").ConnectionString
 
         Using connection As New MySqlConnection(connectionString)
             connection.Open()
 
-            ' Excluir a tarefa da tabela T1_TAREFAS
+            'Excluir a tarefa da tabela T1_TAREFAS
             Dim deleteTarefaQuery As String = "DELETE FROM T1_TAREFAS WHERE ID = @TarefaId"
             Using cmd As New MySqlCommand(deleteTarefaQuery, connection)
                 cmd.Parameters.AddWithValue("@TarefaId", tarefaId)
@@ -136,19 +151,19 @@ Public Class _Default
             End Using
         End Using
 
-        ' Recarregar as tarefas após a remoção
+        'Recarregar as tarefas após a remoção
         CarregarTarefas()
     End Sub
 
     Protected Sub SalvarTarefa_Click(sender As Object, e As EventArgs)
-        ' Verifique se os campos estão preenchidos
+        ' Verifica se os campos estão preenchidos
         If String.IsNullOrWhiteSpace(titulotarefa.Value) Or String.IsNullOrWhiteSpace(criadescricao.Value) Then
             ' Exiba uma mensagem de erro
             ScriptManager.RegisterStartupScript(Me, Me.GetType(), "ShowError", "alert('Preencha todos os campos antes de salvar.');", True)
             Return
         End If
 
-        ' Verifique se o título já existe na tabela
+        ' Verifica se o título já existe na tabela
         If TarefaTituloExiste(titulotarefa.Value) Then
             ' Exiba uma mensagem de erro
             ScriptManager.RegisterStartupScript(Me, Me.GetType(), "ShowError", "alert('Já existe uma tarefa com esse título.');", True)
@@ -215,14 +230,25 @@ Public Class _Default
 
 
             query = "UPDATE t1_tarefas SET TITULO = @NovoTitulo, Descricao = @NovaDescricao WHERE ID = @IdTarefa"
-                command = New MySqlCommand(query, connection)
-                command.Parameters.AddWithValue("@NovoTitulo", novoTitulo)
+            command = New MySqlCommand(query, connection)
+            command.Parameters.AddWithValue("@NovoTitulo", novoTitulo)
             command.Parameters.AddWithValue("@NovaDescricao", editadescricao.Value)
             command.Parameters.AddWithValue("@IdTarefa", idTarefa)
 
 
             command.ExecuteNonQuery()
         End Using
+    End Sub
+    Protected Sub chkConcluido_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs)
+        Dim checkBox As CheckBox = DirectCast(sender, CheckBox)
+        Dim row As GridViewRow = DirectCast(checkBox.NamingContainer, GridViewRow)
+        Dim tarefaId As Integer = Convert.ToInt32(gridTarefas.DataKeys(row.RowIndex).Value)
+        Dim concluido As Boolean = checkBox.Checked
+
+        AtualizarConclusaoTarefa(tarefaId, concluido)
+
+        ' Recarregar as tarefas após a atualização
+        CarregarTarefas()
     End Sub
 
 End Class
